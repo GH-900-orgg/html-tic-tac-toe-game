@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tic-tac-toe</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      display: grid;
+      min-height: 100vh;
+      margin: 0;
+      place-items: center;
+      padding: 1.5rem;
+      background: #f1f5f9;
+      color: #172554;
+      font-family: system-ui, sans-serif;
+    }
+    main { width: min(100%, 24rem); text-align: center; }
+    h1 { margin: 0 0 0.5rem; }
+    p { margin: 0 0 1.5rem; }
+    #status { font-weight: 700; min-height: 1.5em; }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .cell {
+      aspect-ratio: 1;
+      border: 2px solid #cbd5e1;
+      border-radius: 0.75rem;
+      background: #fff;
+      color: #1d4ed8;
+      font: 700 clamp(2.5rem, 12vw, 4rem) system-ui, sans-serif;
+      cursor: pointer;
+    }
+    .cell:disabled { opacity: 1; cursor: default; }
+    .cell:not(:disabled):hover { background: #dbeafe; }
+    button:focus-visible { outline: 3px solid #f97316; outline-offset: 3px; }
+    #restart {
+      border: 0;
+      border-radius: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      background: #1d4ed8;
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Tic-tac-toe</h1>
+    <p>Two players take turns. Get three in a row to win!</p>
+    <p id="status" role="status" aria-live="polite">Player X's turn</p>
+    <div class="board" aria-label="Tic-tac-toe board">
+      <button class="cell" type="button" aria-label="Row 1, column 1: empty"></button>
+      <button class="cell" type="button" aria-label="Row 1, column 2: empty"></button>
+      <button class="cell" type="button" aria-label="Row 1, column 3: empty"></button>
+      <button class="cell" type="button" aria-label="Row 2, column 1: empty"></button>
+      <button class="cell" type="button" aria-label="Row 2, column 2: empty"></button>
+      <button class="cell" type="button" aria-label="Row 2, column 3: empty"></button>
+      <button class="cell" type="button" aria-label="Row 3, column 1: empty"></button>
+      <button class="cell" type="button" aria-label="Row 3, column 2: empty"></button>
+      <button class="cell" type="button" aria-label="Row 3, column 3: empty"></button>
+    </div>
+    <button id="restart" type="button">Restart game</button>
+  </main>
+  <script>
+    const cells = Array.from(document.querySelectorAll('.cell'));
+    const status = document.getElementById('status');
+    const winningLines = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
+    ];
+    let board = Array(9).fill('');
+    let player = 'X';
+
+    cells.forEach((cell, index) => {
+      cell.addEventListener('click', () => {
+        board[index] = player;
+        cell.textContent = player;
+        cell.setAttribute('aria-label', `Row ${Math.floor(index / 3) + 1}, column ${index % 3 + 1}: ${player}`);
+        cell.disabled = true;
+
+        if (winningLines.some(line => line.every(position => board[position] === player))) {
+          status.textContent = `Player ${player} wins!`;
+          cells.forEach(square => { square.disabled = true; });
+        } else if (board.every(Boolean)) {
+          status.textContent = "It's a draw!";
+        } else {
+          player = player === 'X' ? 'O' : 'X';
+          status.textContent = `Player ${player}'s turn`;
+        }
+      });
+    });
+
+    document.getElementById('restart').addEventListener('click', () => {
+      board = Array(9).fill('');
+      player = 'X';
+      status.textContent = "Player X's turn";
+      cells.forEach((cell, index) => {
+        cell.textContent = '';
+        cell.disabled = false;
+        cell.setAttribute('aria-label', `Row ${Math.floor(index / 3) + 1}, column ${index % 3 + 1}: empty`);
+      });
+    });
+  </script>
+</body>
+</html>
